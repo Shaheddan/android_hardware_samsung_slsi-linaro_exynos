@@ -827,8 +827,11 @@ static CSC_ERRORCODE csc_init_hw(
     if (csc_handle->csc_method == CSC_METHOD_HW) {
         if (csc_handle->csc_hw_handle == NULL) {
             ALOGE("%s:: CSC_METHOD_HW can't open HW", __func__);
-            free(csc_handle);
-            csc_handle = NULL;
+            /*
+             * Don't free the handle here: it belongs to whoever called csc_init(),
+             * who keeps using it and frees it with csc_deinit(). Freeing it here
+             * turned that into a use-after-free and a double free.
+             */
             ret = CSC_ErrorNotInit;
         }
     }
